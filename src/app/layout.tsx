@@ -1,6 +1,6 @@
 "use client";
 import { Playfair_Display, Inter } from "next/font/google";
-import { ReactLenis } from "@studio-freight/react-lenis";
+import SmoothScroll from "@/components/SmoothScroll";
 import "./globals.css";
 
 const playfair = Playfair_Display({ subsets: ["latin"], variable: "--font-playfair" });
@@ -11,9 +11,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en">
       <body className={`${playfair.variable} ${inter.variable} antialiased`}>
         {/* Smooth Scroll Wrapper */}
-        <ReactLenis root options={{ lerp: 0.1, duration: 1.5 }}>
-          <>{children}</>
-        </ReactLenis>
+        <SmoothScroll>
+          {children}
+        </SmoothScroll>
       </body>
     </html>
   );

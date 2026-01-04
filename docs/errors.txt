@@ -1,23 +1,71 @@
-PS C:\Users\alexr\Desktop\kinstel work\khanlegal\legalkhan> npm run build
-
-> legalkhan@0.1.0 build
-> next build
-
-▲ Next.js 16.1.1 (Turbopack)
-
-  Creating an optimized production build ...
-✓ Compiled successfully in 2.3s
-  Running TypeScript  .Failed to compile.
-
-./src/app/layout.tsx:14:63
-Type error: Object literal may only specify known properties, and 'smoothTouch' does not exist in type 'LenisOptions'.
-
-  12 |       <body className={`${playfair.variable} ${inter.variable} antialiased`}>
-  13 |         {/* Smooth Scroll Wrapper */}
-> 14 |         <ReactLenis root options={{ lerp: 0.1, duration: 1.5, smoothTouch: true }}>
-     |                                                               ^
-  15 |           {children}
-  16 |         </ReactLenis>
-  17 |       </body>
-Next.js build worker exited with code: 1 and signal: null
+ npm i
+npm warn ERESOLVE overriding peer dependency
+npm warn While resolving: @studio-freight/hamo@0.6.33
+npm warn Found: react@19.2.3
+npm warn node_modules/react
+npm warn   react@"19.2.3" from the root project
+npm warn   7 more (framer-motion, lucide-react, next, react-dom, styled-jsx, ...)
+npm warn
+npm warn Could not resolve dependency:
+npm warn peer react@"^18.2.0" from @studio-freight/hamo@0.6.33
+npm warn node_modules/@studio-freight/hamo
+npm warn   @studio-freight/hamo@"^0.6.28" from @studio-freight/react-lenis@0.0.47
+npm warn   node_modules/@studio-freight/react-lenis
+npm warn
+npm warn Conflicting peer dependency: react@18.3.1
+npm warn node_modules/react
+npm warn   peer react@"^18.2.0" from @studio-freight/hamo@0.6.33
+npm warn   node_modules/@studio-freight/hamo
+npm warn     @studio-freight/hamo@"^0.6.28" from @studio-freight/react-lenis@0.0.47
+npm warn     node_modules/@studio-freight/react-lenis
+npm warn ERESOLVE overriding peer dependency
+npm warn While resolving: @studio-freight/hamo@0.6.33
+npm warn Found: react-dom@19.2.3
+npm warn node_modules/react-dom
+npm warn   react-dom@"19.2.3" from the root project
+npm warn   2 more (framer-motion, next)
+npm warn
+npm warn Could not resolve dependency:
+npm warn peer react-dom@"^18.2.0" from @studio-freight/hamo@0.6.33
+npm warn node_modules/@studio-freight/hamo
+npm warn   @studio-freight/hamo@"^0.6.28" from @studio-freight/react-lenis@0.0.47
+npm warn   node_modules/@studio-freight/react-lenis
+npm warn
+npm warn Conflicting peer dependency: react-dom@18.3.1
+npm warn node_modules/react-dom
+npm warn   peer react-dom@"^18.2.0" from @studio-freight/hamo@0.6.33
+npm warn   node_modules/@studio-freight/hamo
+npm warn     @studio-freight/hamo@"^0.6.28" from @studio-freight/react-lenis@0.0.47
+npm warn     node_modules/@studio-freight/react-lenis
+npm error code ERESOLVE
+npm error ERESOLVE could not resolve
+npm error
+npm error While resolving: @studio-freight/react-lenis@0.0.47
+npm error Found: react-dom@19.2.3
+npm error node_modules/react-dom
+npm error   react-dom@"19.2.3" from the root project
+npm error   peerOptional react-dom@"^18.0.0 || ^19.0.0" from framer-motion@12.23.26
+npm error   node_modules/framer-motion
+npm error     framer-motion@"^12.23.26" from the root project
+npm error   1 more (next)
+npm error
+npm error Could not resolve dependency:
+npm error peer react-dom@"^17 || ^18" from @studio-freight/react-lenis@0.0.47
+npm error node_modules/@studio-freight/react-lenis
+npm error   @studio-freight/react-lenis@"^0.0.47" from the root project
+npm error
+npm error Conflicting peer dependency: react-dom@18.3.1
+npm error node_modules/react-dom
+npm error   peer react-dom@"^17 || ^18" from @studio-freight/react-lenis@0.0.47
+npm error   node_modules/@studio-freight/react-lenis
+npm error     @studio-freight/react-lenis@"^0.0.47" from the root project
+npm error
+npm error Fix the upstream dependency conflict, or retry
+npm error this command with --force or --legacy-peer-deps
+npm error to accept an incorrect (and potentially broken) dependency resolution.
+npm error
+npm error
+npm error For a full report see:
+npm error C:\Users\alexr\AppData\Local\npm-cache\_logs\2026-01-04T11_33_17_848Z-eresolve-report.txt
+npm error A complete log of this run can be found in: C:\Users\alexr\AppData\Local\npm-cache\_logs\2026-01-04T11_33_17_848Z-debug-0.log
 PS C:\Users\alexr\Desktop\kinstel work\khanlegal\legalkhan> 
