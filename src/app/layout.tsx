@@ -11,8 +11,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en">
       <body className={`${playfair.variable} ${inter.variable} antialiased`}>
         {/* Smooth Scroll Wrapper */}
-        <ReactLenis root options={{ lerp: 0.1, duration: 1.5, smoothTouch: true }}>
-          {children}
+        <ReactLenis root options={{ lerp: 0.1, duration: 1.5 }}>
+          <>{children}</>
         </ReactLenis>
       </body>
     </html>

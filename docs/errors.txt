@@ -1,0 +1,23 @@
+PS C:\Users\alexr\Desktop\kinstel work\khanlegal\legalkhan> npm run build
+
+> legalkhan@0.1.0 build
+> next build
+
+▲ Next.js 16.1.1 (Turbopack)
+
+  Creating an optimized production build ...
+✓ Compiled successfully in 2.3s
+  Running TypeScript  .Failed to compile.
+
+./src/app/layout.tsx:14:63
+Type error: Object literal may only specify known properties, and 'smoothTouch' does not exist in type 'LenisOptions'.
+
+  12 |       <body className={`${playfair.variable} ${inter.variable} antialiased`}>
+  13 |         {/* Smooth Scroll Wrapper */}
+> 14 |         <ReactLenis root options={{ lerp: 0.1, duration: 1.5, smoothTouch: true }}>
+     |                                                               ^
+  15 |           {children}
+  16 |         </ReactLenis>
+  17 |       </body>
+Next.js build worker exited with code: 1 and signal: null
+PS C:\Users\alexr\Desktop\kinstel work\khanlegal\legalkhan> 

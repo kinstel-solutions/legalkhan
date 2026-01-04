@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, Variants } from "framer-motion";
 import { Search } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
@@ -12,12 +12,12 @@ interface NavbarProps {
 export default function Navbar({ darkText = false }: NavbarProps) {
   const [isOpen, setIsOpen] = useState(false);
 
-  const menuVariants = {
+  const menuVariants: Variants = {
     closed: { x: "100%", transition: { duration: 0.5, ease: "easeInOut" } },
     open: { x: 0, transition: { duration: 0.5, ease: "easeInOut" } },
   };
 
-  const linkVariants = {
+  const linkVariants: Variants = {
     closed: { opacity: 0, y: 20 },
     open: (i: number) => ({
       opacity: 1,
