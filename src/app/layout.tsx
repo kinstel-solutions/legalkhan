@@ -9,37 +9,26 @@ const playfair = Playfair_Display({
 });
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
+const SITE_URL = "https://legal-khan.vercel.app";
+
 export const metadata: Metadata = {
-  metadataBase: new URL("https://legal-khan.vercel.app"),
+  metadataBase: new URL(SITE_URL),
   title: {
     default: "Legal Khan Associates | Premier Legal Service Provider",
     template: "%s | Legal Khan Associates",
   },
   description:
-    "Legal Khan Associates is a premier legal service provider with a legacy of over half a century. Expertise in IP, Banking, Dispute Resolution, and more. Located in Lucknow.",
-  keywords: [
-    "Legal Khan Associates",
-    "Law Firm Lucknow",
-    "Advocate Saleem Khan",
-    "Benazir Khan",
-    "Legal Services India",
-    "Corporate Law",
-    "Intellectual Property",
-    "Civil Litigation",
-  ],
-  authors: [{ name: "Legal Khan Associates" }],
-  creator: "Legal Khan Associates",
+    "Legal Khan Associates is a premier legal service provider with over 50 years of legal excellence.",
   openGraph: {
     type: "website",
-    locale: "en_US",
-    url: "https://legal-khan.vercel.app",
+    url: SITE_URL,
+    siteName: "Legal Khan Associates",
     title: "Legal Khan Associates | Premier Legal Service Provider",
     description:
       "Expertise | Experience | Excellence. A legacy of over 50 years in legal practice.",
-    siteName: "Legal Khan Associates",
     images: [
       {
-        url: "/images/LegalKhan-Img1.png",
+        url: `${SITE_URL}/images/LegalKhan-Img1.png`,
         width: 1200,
         height: 630,
         alt: "Legal Khan Associates Office",
@@ -51,11 +40,7 @@ export const metadata: Metadata = {
     title: "Legal Khan Associates | Premier Legal Service Provider",
     description:
       "Expertise | Experience | Excellence. Serving clients with over 50 years of legal heritage.",
-    images: ["/images/LegalKhan-Img1.png"],
-  },
-  icons: {
-    icon: "/favicon.ico",
-    apple: "/apple-icon.png", // Assuming these might exist or fall back
+    images: [`${SITE_URL}/images/LegalKhan-Img1.png`],
   },
 };
 
