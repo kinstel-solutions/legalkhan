@@ -4,6 +4,7 @@ import Section from "@/components/Section";
 import Navbar from "@/components/Navbar";
 import ScrollProgressBtn from "@/components/ScrollProgressBtn";
 import RightNav from "@/components/RightNav";
+import WelcomeDialog from "@/components/WelcomeDialog";
 
 const SECTIONS = [
   {
@@ -78,6 +79,7 @@ export default function Home() {
 
   return (
     <main className="relative bg-black">
+      <WelcomeDialog />
       <Navbar darkText={isLightBackground} />
       <ScrollProgressBtn />
       <RightNav
