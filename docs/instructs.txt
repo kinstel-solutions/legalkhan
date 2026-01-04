@@ -1,0 +1,375 @@
+Here is the complete, consolidated code base to recreate the Khaitan & Co animation effect in Next.js. I have organized it by file structure so you can copy-paste it directly.
+
+1. Prerequisites & Setup
+First, install the necessary animation and utility libraries:
+
+Bash
+
+npm install framer-motion lucide-react @studio-freight/react-lenis clsx tailwind-merge
+2. Configuration Files
+tailwind.config.js Ensure your font variables are set up to match the "Legal" aesthetic.
+
+JavaScript
+
+/** @type {import('tailwindcss').Config} */
+module.exports = {
+  content: [
+    "./pages/**/*.{js,ts,jsx,tsx,mdx}",
+    "./components/**/*.{js,ts,jsx,tsx,mdx}",
+    "./app/**/*.{js,ts,jsx,tsx,mdx}",
+  ],
+  theme: {
+    extend: {
+      fontFamily: {
+        serif: ['var(--font-playfair)', 'serif'],
+        sans: ['var(--font-inter)', 'sans-serif'],
+      },
+    },
+  },
+  plugins: [],
+};
+3. Reusable UI Components
+components/GhostButton.tsx The elegant button with the sliding fill effect.
+
+TypeScript
+
+import React from "react";
+
+interface GhostButtonProps {
+  text?: string;
+  className?: string;
+}
+
+export default function GhostButton({ text = "Explore", className = "" }: GhostButtonProps) {
+  return (
+    <button className={`
+      group relative px-8 py-3 overflow-hidden 
+      border border-current transition-colors duration-300 ease-out
+      hover:text-black hover:border-white ${className}
+    `}>
+      <span className="relative z-10 text-xs uppercase tracking-[0.2em] font-medium">
+        {text}
+      </span>
+      <span className="
+        absolute inset-0 bg-white transform scale-x-0 origin-left 
+        transition-transform duration-300 ease-out 
+        group-hover:scale-x-100
+      "/>
+    </button>
+  );
+}
+components/ScrollProgressBtn.tsx The circular scroll indicator in the bottom right.
+
+TypeScript
+
+"use client";
+import { motion, useScroll } from "framer-motion";
+import { ArrowDown } from "lucide-react";
+import { useEffect, useState } from "react";
+
+export default function ScrollProgressBtn() {
+  const { scrollYProgress } = useScroll();
+  const [isComplete, setIsComplete] = useState(false);
+
+  useEffect(() => {
+    return scrollYProgress.on("change", (v) => setIsComplete(v > 0.95));
+  }, [scrollYProgress]);
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  return (
+    <motion.div
+      className="fixed bottom-10 right-10 z-40 cursor-pointer mix-blend-difference text-white hidden md:block"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ delay: 1 }}
+      onClick={isComplete ? scrollToTop : undefined}
+    >
+      <div className="relative flex items-center justify-center w-16 h-16">
+        {/* Track */}
+        <svg className="absolute w-full h-full transform -rotate-90">
+          <circle cx="32" cy="32" r="28" stroke="currentColor" strokeWidth="1" fill="transparent" className="opacity-20" />
+          {/* Indicator */}
+          <motion.circle
+            cx="32" cy="32" r="28" stroke="currentColor" strokeWidth="1" fill="transparent"
+            style={{ pathLength: scrollYProgress }}
+          />
+        </svg>
+        {/* Icon */}
+        <motion.div animate={{ rotate: isComplete ? 180 : 0 }}>
+            <ArrowDown size={20} strokeWidth={1} />
+        </motion.div>
+      </div>
+    </motion.div>
+  );
+}
+components/Navbar.tsx Includes the Adaptive Logo, Search Icon, Vertical Hamburger, and Fullscreen Menu.
+
+TypeScript
+
+"use client";
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Search } from "lucide-react";
+import Link from "next/link";
+
+export default function Navbar() {
+  const [isOpen, setIsOpen] = useState(false);
+
+  const menuVariants = {
+    closed: { x: "100%", transition: { duration: 0.5, ease: "easeInOut" } },
+    open: { x: 0, transition: { duration: 0.5, ease: "easeInOut" } },
+  };
+
+  const linkVariants = {
+    closed: { opacity: 0, y: 20 },
+    open: (i: number) => ({ opacity: 1, y: 0, transition: { delay: 0.3 + i * 0.1 } }),
+  };
+
+  const links = ["Expertise", "People", "News & Events", "Legacy", "Blog"];
+
+  return (
+    <>
+      {/* FIXED HEADER */}
+      <nav className="fixed top-0 w-full z-50 p-6 md:p-10 flex justify-between items-center mix-blend-difference text-white">
+        
+        {/* LOGO */}
+        <Link href="/" className="group">
+          <div className="flex flex-col">
+            <span className="text-xl md:text-2xl font-serif font-bold tracking-wide">KHAITAN & CO</span>
+            <span className="text-[8px] md:text-[10px] uppercase tracking-[0.2em] opacity-80 mt-1">Advocates Since 1911</span>
+          </div>
+        </Link>
+
+        {/* RIGHT ACTIONS */}
+        <div className="flex items-center gap-6 md:gap-8">
+          <button className="hover:opacity-70 transition-opacity">
+            <Search size={24} strokeWidth={1.5} />
+          </button>
+
+          {/* VERTICAL HAMBURGER */}
+          <button 
+            onClick={() => setIsOpen(true)} 
+            className="group flex gap-[5px] hover:gap-[7px] transition-all duration-300 h-6 md:h-8 items-center"
+          >
+            <span className="w-[2px] h-6 md:h-8 bg-white group-hover:h-10 transition-all duration-300"></span>
+            <span className="w-[2px] h-6 md:h-8 bg-white group-hover:h-5 transition-all duration-300"></span>
+            <span className="w-[2px] h-6 md:h-8 bg-white group-hover:h-10 transition-all duration-300"></span>
+          </button>
+        </div>
+      </nav>
+
+      {/* FULLSCREEN MENU OVERLAY */}
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            variants={menuVariants}
+            initial="closed"
+            animate="open"
+            exit="closed"
+            className="fixed inset-0 z-[60] bg-[#003366] text-white p-10 flex flex-col justify-center"
+          >
+            <button onClick={() => setIsOpen(false)} className="absolute top-10 right-10 text-4xl hover:rotate-90 transition-transform duration-300">
+              ×
+            </button>
+            <div className="flex flex-col gap-6 items-center md:items-start md:pl-20">
+              {links.map((link, i) => (
+                <motion.a
+                  key={link}
+                  custom={i}
+                  variants={linkVariants}
+                  href="#"
+                  className="text-4xl md:text-6xl font-serif hover:italic transition-all cursor-pointer"
+                >
+                  {link}
+                </motion.a>
+              ))}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </>
+  );
+}
+4. The Core Animation Component
+components/Section.tsx This handles the "Sticky Stack" logic, image parallax, and text staggering.
+
+TypeScript
+
+"use client";
+import { useRef } from "react";
+import { motion, useScroll, useTransform } from "framer-motion";
+import Image from "next/image";
+import GhostButton from "./GhostButton";
+
+interface SectionProps {
+  title: string;
+  subtitle: string;
+  description: string;
+  color: string;
+  textColor: string;
+  imageSrc?: string;
+  index: number;
+}
+
+export default function Section({ title, subtitle, description, color, textColor, imageSrc, index }: SectionProps) {
+  const container = useRef(null);
+  
+  // 1. Track scroll progress for this specific container
+  const { scrollYProgress } = useScroll({
+    target: container,
+    offset: ["start start", "end start"],
+  });
+
+  // 2. Create the Parallax/Scale effect
+  const scale = useTransform(scrollYProgress, [0, 1], [1, 0.9]);
+  const opacity = useTransform(scrollYProgress, [0, 1], [1, 0.5]);
+
+  // 3. Text Stagger Variants
+  const textVariants = {
+    hidden: { opacity: 0, y: 40 },
+    visible: { 
+      opacity: 1, 
+      y: 0,
+      transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] }
+    }
+  };
+
+  return (
+    // The container determines the height of the scroll area
+    <div ref={container} className="h-screen sticky top-0 z-0">
+      <motion.section
+        style={{ backgroundColor: color, color: textColor, scale }}
+        className="relative h-full w-full flex flex-col justify-center overflow-hidden border-t border-white/10"
+      >
+        {/* BACKGROUND IMAGE (Optional) */}
+        {imageSrc && (
+          <div className="absolute inset-0 z-0">
+            <Image 
+              src={imageSrc} 
+              alt={title} 
+              fill 
+              className="object-cover opacity-60" 
+            />
+            <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent" />
+          </div>
+        )}
+
+        {/* CONTENT */}
+        <motion.div 
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: false, amount: 0.4 }}
+          transition={{ staggerChildren: 0.2 }}
+          className="relative z-10 px-8 md:px-20 max-w-4xl"
+        >
+          {/* Eyebrow */}
+          <motion.span variants={textVariants} className="block text-xs md:text-sm uppercase tracking-[0.3em] mb-6 opacity-70 font-bold">
+            {title}
+          </motion.span>
+          
+          {/* Heading */}
+          <motion.h2 variants={textVariants} className="text-4xl md:text-7xl font-serif leading-[1.1] mb-8">
+            {subtitle}
+          </motion.h2>
+
+          {/* Description */}
+          <motion.p variants={textVariants} className="text-lg md:text-xl opacity-90 max-w-2xl mb-12 leading-relaxed">
+            {description}
+          </motion.p>
+
+          {/* Buttons */}
+          <motion.div variants={textVariants} className="flex flex-col md:flex-row gap-4">
+            <GhostButton text="Explore Practice Areas" />
+            <GhostButton text="View Case Studies" />
+          </motion.div>
+        </motion.div>
+
+      </motion.section>
+    </div>
+  );
+}
+5. Main Application Structure
+app/layout.tsx Sets up smooth scrolling (Lenis) and fonts.
+
+TypeScript
+
+"use client";
+import { Playfair_Display, Inter } from "next/font/google";
+import { ReactLenis } from "@studio-freight/react-lenis";
+import "./globals.css";
+
+const playfair = Playfair_Display({ subsets: ["latin"], variable: "--font-playfair" });
+const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="en">
+      <body className={`${playfair.variable} ${inter.variable} antialiased`}>
+        {/* Smooth Scroll Wrapper */}
+        <ReactLenis root options={{ lerp: 0.1, duration: 1.5 }}>
+          {children}
+        </ReactLenis>
+      </body>
+    </html>
+  );
+}
+app/page.tsx Putting it all together.
+
+TypeScript
+
+import Section from "@/components/Section";
+import Navbar from "@/components/Navbar";
+import ScrollProgressBtn from "@/components/ScrollProgressBtn";
+
+const SECTIONS = [
+  {
+    title: "Expertise",
+    subtitle: "Facilitating commercial legal solutions",
+    description: "Our expertise across diverse practice areas and sectors covers varied and nuanced needs. Backed by over 100 years of legal heritage.",
+    color: "#003366", // Dark Blue
+    textColor: "#ffffff",
+  },
+  {
+    title: "Thought Leadership",
+    subtitle: "Leveraging insight to script legal discourse",
+    description: "We contribute meaningfully to the discourse on legal developments and trends in the practices and sectors we work in.",
+    color: "#ffffff", // White
+    textColor: "#003366",
+    // imageSrc: "/path-to-your-image.jpg" // Add an image here to test the parallax
+  },
+  {
+    title: "People",
+    subtitle: "Home to inspired performances",
+    description: "Leaders and professionals at Khaitan & Co excel at what they do. Each member of our team is equipped and empowered to deliver exceptional service.",
+    color: "#004488", // Medium Blue
+    textColor: "#ffffff",
+  },
+  {
+    title: "Legacy",
+    subtitle: "A century of trust and excellence",
+    description: "Founded in 1911, we have been part of India's legal history, evolving with the nation while maintaining our core values.",
+    color: "#1a1a1a", // Dark Grey/Black
+    textColor: "#ffffff",
+  },
+];
+
+export default function Home() {
+  return (
+    <main className="relative bg-black">
+      <Navbar />
+      <ScrollProgressBtn />
+      
+      {SECTIONS.map((sec, i) => (
+        <Section key={i} {...sec} index={i} />
+      ))}
+      
+      {/* Extra spacer at bottom if needed */}
+      <div className="h-[50vh] bg-[#003366] flex items-center justify-center text-white/50">
+        <p>Footer Content</p>
+      </div>
+    </main>
+  );
+}

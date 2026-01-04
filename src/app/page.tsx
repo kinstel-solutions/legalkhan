@@ -1,65 +1,103 @@
-import Image from "next/image";
+"use client";
+import { useState, useEffect } from "react";
+import Section from "@/components/Section";
+import Navbar from "@/components/Navbar";
+import ScrollProgressBtn from "@/components/ScrollProgressBtn";
+import RightNav from "@/components/RightNav";
+
+const SECTIONS = [
+  {
+    title: "Who We Are",
+    subtitle: "A legacy of over half a century",
+    description:
+      "Our beloved ancestor, the Late Abdul Sattar Khan, started his legal practice in Pilibhit district of Uttar Pradesh, approximately 50 years ago. His legacy is now being successfully carried forward by Ms. Benazir Khan and Mr. Saleem Khan.",
+    color: "#003366", // Dark Blue
+    textColor: "#ffffff",
+    imageSrc:
+      "https://images.unsplash.com/photo-1491336477066-31156b5e4f35?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+  },
+  {
+    title: "Our Vision",
+    subtitle: "Progressive and innovative legal solutions",
+    description:
+      "We instinctively take a fresh perspective on situations, exploring whether there are newer and better ways of delivering practical, commercial solutions to the challenges our clients face in today's rapidly changing business landscape.",
+    color: "#F5F5F5", // Off-White / Light Grey Background
+    textColor: "#003366", // DARK BLUE Text
+    imageSrc: "/images/LegalKhan-Img1.png",
+  },
+  {
+    title: "Practice Areas",
+    subtitle: "Expertise across diverse sectors",
+    description:
+      "From Intellectual Property and Banking & Finance to Dispute Resolution and Real Estate, our team delivers expert legal advice across a wide gamut of sectors and industries.",
+    color: "#004488", // Medium Blue
+    textColor: "#ffffff",
+    imageSrc:
+      "https://images.unsplash.com/photo-1450101499163-c8848c66ca85?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+  },
+  {
+    title: "Legal Documents",
+    subtitle: "Comprehensive documentation services",
+    description:
+      "From birth to death, every individual relies on various documents. We handle a wide range of agreements, contracts, and legal certificates to ensure your life and business run smoothly.",
+    color: "#1a1a1a", // Dark Grey/Black
+    textColor: "#ffffff",
+    imageSrc:
+      "https://images.unsplash.com/photo-1505664194779-8beaceb93744?auto=format&fit=crop&w=1920&q=80",
+  },
+];
 
 export default function Home() {
+  const [activeSection, setActiveSection] = useState(0);
+
+  // Function to scroll to specific section
+  const handleNavClick = (index: number) => {
+    const sectionElement = document.getElementById(`section-${index}`);
+    sectionElement?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  // Simple logic to update active state on scroll
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollPosition = window.scrollY + window.innerHeight / 2;
+      const windowHeight = window.innerHeight;
+      const currentIndex = Math.floor(scrollPosition / windowHeight);
+
+      // Ensure index stays within bounds
+      if (currentIndex >= 0 && currentIndex < SECTIONS.length) {
+        setActiveSection(currentIndex);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const currentSection = SECTIONS[activeSection] || SECTIONS[0];
+  const isLightBackground = currentSection.textColor !== "#ffffff";
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
+    <main className="relative bg-black">
+      <Navbar darkText={isLightBackground} />
+      <ScrollProgressBtn />
+      <RightNav
+        activeIndex={activeSection}
+        onChange={handleNavClick}
+      />
+
+      {SECTIONS.map((sec, i) => (
+        <Section
+          key={i}
+          id={`section-${i}`}
+          {...sec}
+          index={i}
         />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+      ))}
+
+      {/* Extra spacer at bottom if needed */}
+      <div className="h-[50vh] bg-[#003366] flex items-center justify-center text-white/50">
+        <p>Footer Content</p>
+      </div>
+    </main>
   );
 }

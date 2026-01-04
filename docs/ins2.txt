@@ -1,0 +1,295 @@
+Fix 1: Add the "Shrink & Dim" Effect (Parallax)
+Your previous code might have had the logic, but the offset needs to be precise for this to trigger as the next section covers it.
+
+Update components/Section.tsx:
+
+JavaScript
+
+"use client";
+import { motion, useScroll, useTransform } from "framer-motion";
+import { useRef } from "react";
+
+export default function Section({ title, subtitle, color, textColor, index }) {
+  const container = useRef(null);
+
+  const { scrollYProgress } = useScroll({
+    target: container,
+    // "start start" = when top of section hits top of viewport
+    // "end start" = when bottom of section hits top of viewport
+    offset: ["start start", "end start"], 
+  });
+
+  // Scale goes from 1 (full size) to 0.9 (slightly smaller) as you scroll past it
+  const scale = useTransform(scrollYProgress, [0, 1], [1, 0.9]);
+  // Opacity fades slightly to 0.5 to darken it
+  const opacity = useTransform(scrollYProgress, [0, 1], [1, 0.5]);
+
+  return (
+    // Essential: This container allows us to track scroll progress
+    <div ref={container} className="h-screen sticky top-0">
+      
+      {/* The Motion Section applies the scale/opacity to the visual card */}
+      <motion.section
+        style={{ 
+          backgroundColor: color, 
+          color: textColor,
+          scale,    // <--- Applying the shrink effect
+          opacity   // <--- Applying the fade effect
+        }}
+        className="h-full w-full flex flex-col justify-center px-8 md:px-20 border-t border-black/5 origin-top" 
+        // ^ origin-top ensures it shrinks from the bottom up
+      >
+        <span className="text-sm uppercase tracking-widest mb-4 opacity-70">
+          {title}
+        </span>
+        <h2 className="text-4xl md:text-6xl font-serif max-w-2xl leading-tight mb-8">
+          {subtitle}
+        </h2>
+        
+        {/* Buttons */}
+        <div className="flex gap-4">
+          <button className="px-6 py-3 border border-current uppercase text-xs tracking-widest hover:bg-current hover:text-white transition-colors">
+             Explore Practice Areas
+          </button>
+          <button className="px-6 py-3 border border-current uppercase text-xs tracking-widest hover:bg-current hover:text-white transition-colors">
+             View Case Studies
+          </button>
+        </div>
+      </motion.section>
+    </div>
+  );
+}
+Fix 2: Correct the Colors
+In your video, the second section is unreadable. You need to explicitly pass the correct hex codes for the "Thought Leadership" section in your page.tsx.
+
+Update app/page.tsx data:
+
+JavaScript
+
+const SECTIONS = [
+  {
+    title: "Expertise",
+    subtitle: "Facilitating commercial legal solutions",
+    color: "#003366", // Dark Blue
+    textColor: "#ffffff", // White Text
+  },
+  {
+    title: "Thought Leadership",
+    subtitle: "Leveraging insight to script legal discourse",
+    color: "#F5F5F5", // Off-White / Light Grey Background
+    textColor: "#003366", // DARK BLUE Text (Crucial for readability)
+  },
+  {
+    title: "People",
+    subtitle: "Home to inspired performances",
+    color: "#004488", // Medium Blue
+    textColor: "#ffffff", // White Text
+  },
+];
+Fix 3: Install Smooth Scrolling (Essential for this look)
+The animation will never look right with default Chrome/Safari scrolling. You need to smooth out the mouse/touch inputs.
+
+Install Lenis: npm install @studio-freight/react-lenis
+
+Wrap your App (app/layout.tsx):
+
+JavaScript
+
+"use client";
+import { ReactLenis } from "@studio-freight/react-lenis";
+import "./globals.css";
+
+export default function RootLayout({ children }) {
+  return (
+    <html lang="en">
+      <body>
+        {/* These settings mimic the "heavy" luxury feel */}
+        <ReactLenis root options={{ lerp: 0.1, duration: 1.5, smoothTouch: true }}>
+          {children}
+        </ReactLenis>
+      </body>
+    </html>
+  );
+}
+Summary of Next Steps for You:
+Copy the updated Section.tsx (especially the origin-top class and useTransform logic).
+
+Change the text color for the second section to Dark Blue (#003366).
+
+Install React Lenis to fix the jerky scrolling.
+
+Here is the code to fix the Buttons and add the 4-Circle Right Navigation.
+
+1. The Corrected "Outline Button"
+The buttons in the video are strict rectangles with sharp 1px borders. They fill with color when you hover over them.
+
+JavaScript
+
+// components/OutlineButton.tsx
+"use client";
+import { ArrowRight } from "lucide-react";
+
+export default function OutlineButton({ text, onClick, dark = false }) {
+  return (
+    <button
+      onClick={onClick}
+      className={`
+        group relative px-8 py-4 border transition-all duration-300 ease-out
+        uppercase tracking-[0.2em] text-xs font-semibold
+        flex items-center gap-4 overflow-hidden
+        ${dark 
+          ? "border-[#003366] text-[#003366] hover:text-white" 
+          : "border-white text-white hover:text-[#003366]"
+        }
+      `}
+    >
+      {/* Hover Background Fill Effect */}
+      <span 
+        className={`
+          absolute inset-0 w-full h-full transform scale-x-0 group-hover:scale-x-100 
+          transition-transform duration-300 origin-left ease-out z-0
+          ${dark ? "bg-[#003366]" : "bg-white"}
+        `} 
+      />
+
+      {/* Text & Arrow (z-10 to sit on top of fill) */}
+      <span className="relative z-10 flex items-center gap-2">
+        {text}
+        {/* Optional: The "Arrow UI" often appears on hover */}
+        <ArrowRight 
+          size={16} 
+          className="transform -translate-x-2 opacity-0 group-hover:translate-x-0 group-hover:opacity-100 transition-all duration-300" 
+        />
+      </span>
+    </button>
+  );
+}
+2. The "4 Circles" Right Navigation (Scroll Spy)
+This component sits fixed on the right. It tracks which section is in view and highlights the corresponding circle.
+
+How it works:
+
+We track the activeSection index (0 to 3).
+
+We map 4 circles.
+
+The Active Circle gets a "ring" or "scale" effect to stand out.
+
+If "Arrow UI" refers to the navigation, we can place a small arrow inside the active dot.
+
+JavaScript
+
+// components/RightNav.tsx
+"use client";
+import { motion } from "framer-motion";
+
+export default function RightNav({ activeIndex, onChange }) {
+  const sections = ["Expertise", "Thought Leadership", "People", "Legacy"];
+
+  return (
+    <div className="fixed right-8 top-1/2 -translate-y-1/2 z-50 flex flex-col gap-6 mix-blend-difference">
+      {sections.map((_, i) => {
+        const isActive = activeIndex === i;
+
+        return (
+          <button
+            key={i}
+            onClick={() => onChange(i)}
+            className="group relative flex items-center justify-center w-6 h-6"
+          >
+            {/* The Dot (Circle) */}
+            <motion.div
+              animate={{
+                scale: isActive ? 1 : 0.5,
+                opacity: isActive ? 1 : 0.5,
+                backgroundColor: "#fff",
+              }}
+              className="w-2 h-2 rounded-full z-10"
+            />
+
+            {/* The "Active Ring" or "Arrow UI" container */}
+            {isActive && (
+              <motion.div
+                layoutId="active-ring"
+                className="absolute inset-0 border border-white rounded-full"
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1.5, opacity: 1 }}
+                transition={{ duration: 0.3 }}
+              />
+            )}
+            
+            {/* Tooltip (optional, appears on hover) */}
+            <span className="absolute right-10 text-white text-[10px] uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+              {sections[i]}
+            </span>
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+3. Integrating It All (The Controller)
+You need to connect the RightNav to the Sections. We'll use a state in the parent to track which section is currently "Active".
+
+Update app/page.tsx:
+
+JavaScript
+
+"use client";
+import { useState, useEffect } from "react";
+import Section from "@/components/Section";
+import RightNav from "@/components/RightNav";
+// import your other components...
+
+export default function Home() {
+  const [activeSection, setActiveSection] = useState(0);
+
+  // Function to scroll to specific section
+  const handleNavClick = (index) => {
+    const sectionElement = document.getElementById(`section-${index}`);
+    sectionElement?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  // Simple logic to update active state on scroll
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollPosition = window.scrollY + window.innerHeight / 2;
+      const windowHeight = window.innerHeight;
+      const currentIndex = Math.floor(scrollPosition / windowHeight);
+      setActiveSection(currentIndex);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  return (
+    <main className="relative">
+      <RightNav activeIndex={activeSection} onChange={handleNavClick} />
+      
+      {/* Pass "dark" prop to buttons if background is white */}
+      <Section 
+        id="section-0" 
+        index={0} 
+        title="Expertise" 
+        /* ... params ... */ 
+        // Example of using the new button inside Section component:
+        // buttonComponent={<OutlineButton text="Explore" />} 
+      />
+      
+      <Section 
+        id="section-1" 
+        index={1} 
+        title="Thought Leadership" 
+        // This section is LIGHT, so pass dark={true} to button
+        // buttonComponent={<OutlineButton text="Read More" dark={true} />} 
+      />
+      
+      {/* ... other sections ... */}
+    </main>
+  );
+}
+Visual Summary
+Buttons: Now strictly rectangular, uppercase, with a "slide-in" hover fill and a hidden arrow that appears on hover.
+
+Right Side: 4 distinct circles. The "Active" one has a glowing ring around it. Clicking a dot smoothly scrolls you to that section.

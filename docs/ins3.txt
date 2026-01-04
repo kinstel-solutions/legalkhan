@@ -1,0 +1,128 @@
+Here is the updated Section component. I have switched from CSS Grid to Flexbox to create two distinct, hard-separated panels.
+
+The "Split Color" Section Code
+This code forces the left 50% to be a solid color block, while the right 50% houses the image.
+
+JavaScript
+
+// components/Section.tsx
+"use client";
+import { motion, useScroll, useTransform } from "framer-motion";
+import { useRef } from "react";
+import Image from "next/image";
+import OutlineButton from "./OutlineButton"; 
+
+export default function Section({ title, subtitle, description, color, textColor, imageSrc, index }) {
+  const container = useRef(null);
+
+  const { scrollYProgress } = useScroll({
+    target: container,
+    offset: ["start start", "end start"],
+  });
+
+  // Parallax Effect: The whole section shrinks slightly as you scroll past it
+  const scale = useTransform(scrollYProgress, [0, 1], [1, 0.95]);
+  const opacity = useTransform(scrollYProgress, [0, 1], [1, 0.8]);
+
+  return (
+    <div ref={container} className="h-screen sticky top-0 overflow-hidden">
+      <motion.section
+        style={{ scale, opacity }}
+        className="h-full w-full flex flex-col md:flex-row origin-top border-t border-white/10"
+      >
+        
+        {/* --- LEFT PANEL: Solid Color & Content --- */}
+        <div 
+          className="w-full md:w-1/2 h-full flex flex-col justify-center px-10 md:px-24 relative z-10"
+          style={{ backgroundColor: color, color: textColor }} 
+        >
+           {/* Text Content Wrapper */}
+           <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+            >
+              <span className="block text-xs font-bold uppercase tracking-[0.25em] mb-6 opacity-70">
+                {title}
+              </span>
+              
+              <h2 className="text-4xl md:text-6xl font-serif leading-[1.1] mb-8">
+                {subtitle}
+              </h2>
+              
+              <p className="text-lg leading-relaxed opacity-90 mb-12 max-w-md font-light">
+                {description}
+              </p>
+
+              <div className="flex flex-wrap gap-4">
+                {/* We pass 'textColor' to determine if button should be light/dark */}
+                <OutlineButton text="Explore Area" dark={textColor === "#003366"} />
+                <OutlineButton text="Case Studies" dark={textColor === "#003366"} />
+              </div>
+            </motion.div>
+        </div>
+
+
+        {/* --- RIGHT PANEL: Image Only --- */}
+        <div className="hidden md:block w-1/2 h-full relative">
+           {imageSrc ? (
+             <div className="absolute inset-0 w-full h-full">
+               <Image 
+                 src={imageSrc} 
+                 alt={title} 
+                 fill 
+                 className="object-cover" 
+                 priority={index === 0} // Optimize loading for the first image
+               />
+               {/* Optional: Subtle overlay to blend image nicely with the right edge */}
+               <div className="absolute inset-0 bg-black/10" />
+             </div>
+           ) : (
+             // Fallback if no image is provided (keep it the same color or a neutral tone)
+             <div className="w-full h-full bg-gray-100" />
+           )}
+        </div>
+
+      </motion.section>
+    </div>
+  );
+}
+Key Changes Made
+Flexbox Layout (flex md:flex-row):
+
+I replaced absolute positioning for the background with a structured Left/Right split.
+
+Mobile: flex-col (Text on top, image hidden or stacked).
+
+Desktop: flex-row (Side-by-side).
+
+Left Panel (md:w-1/2):
+
+It now accepts the style={{ backgroundColor: color }} directly. This guarantees that the text sits on a solid, opaque block.
+
+Right Panel (md:w-1/2):
+
+This is now a dedicated container for the image. The image is set to object-cover to fill the right half vertically and horizontally without stretching.
+
+How to use it in page.tsx
+This will now render the "Expertise" section as a solid Dark Blue block on the left, and the image on the right.
+
+JavaScript
+
+<Section 
+  title="Expertise"
+  subtitle="Facilitating commercial legal solutions"
+  description="Our expertise across diverse practice areas and sectors covers varied and nuanced needs."
+  color="#003366"      // Solid Dark Blue for Left Panel
+  textColor="#ffffff"  // White text
+  imageSrc="/images/meeting-room.jpg" // Image for Right Panel
+/>
+
+<Section 
+  title="Thought Leadership"
+  subtitle="Leveraging insight to script legal discourse"
+  description="We contribute meaningfully to the discourse on legal developments and trends."
+  color="#F5F5F5"      // Solid Off-White for Left Panel
+  textColor="#003366"  // Dark Blue text
+  imageSrc="/images/pen-paper.jpg" 
+/>
